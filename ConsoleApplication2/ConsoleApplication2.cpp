@@ -14,10 +14,11 @@ public:
 };
 
 class XMLEntity {
+public:
 	virtual string stringify() {};
 };
 
-class XMLContent : XMLEntity {
+class XMLContent : public XMLEntity {
 	string content;
 
 	XMLContent() {}
@@ -31,21 +32,28 @@ class XMLContent : XMLEntity {
 	}
 };
 
-
-
-
-class XMLTag : XMLEntity {
+class XMLTag : public XMLEntity {
+public:
 	string name;
 	vector <XMLTagParams> params;
 	virtual string stringify_params() {
 		string s;
-		for (XMLTagParams param : params)
+		for (XMLTagParams param : this->params)
 			s += " " + param.stringify();
-		return s;
+		return (params.empty() ? "" : s);
 	}
 };
 
+class XMLContentTag : public XMLTag {
+	XMLEntity content;
+	virtual string stringify() override {
+		return ("<" + this->name + this->stringify_params() + ">" + this->content.stringify() + "</" + this->name + ">");
+	}
+};
 
+class XMLSCTag : public XMLTag {
+
+};
 
 int main()
 {

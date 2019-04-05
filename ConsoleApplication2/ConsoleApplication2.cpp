@@ -23,7 +23,6 @@ public:
 class XMLEntity {
 public:
 	virtual string stringify(){
-		return "foo";
 	};
 };
 
@@ -43,11 +42,11 @@ public:
 class XMLTag : public XMLEntity {
 public:
 	string name;
-	vector<XMLTagParameter> params;
+	vector <XMLTagParameter> params;
 
 	XMLTag() {}
 
-	XMLTag(string name, vector<XMLTagParameter> params) {
+	XMLTag(string name, vector <XMLTagParameter> params) {
 		this->name = name;
 		this->params = params;
 	}
@@ -66,27 +65,37 @@ public:
 	
 	XMLContentTag() {}
 
-	XMLContentTag (string name, vector<XMLTagParameter> params, XMLEntity *content) {
+	XMLContentTag(string name, vector <XMLTagParameter> params, XMLEntity* content) {
 		this->name = name;
 		this->params = params;
 		this->content = content;
 	}
 
 	virtual string stringify() override {
-		//cout << endl << this->content.stringify() << " " << typeid(this->content).name() << endl;
-		cout << this->stringify_params() << endl;
 		return ("<" + this->name + this->stringify_params() + ">" + this->content->stringify() + "</" + this->name + ">");
 	}
 };
 
 class XMLArray : public XMLEntity {
+	vector <XMLEntity> content;
 
-
+	XMLArray(vector <XMLEntity> content) {
+		this->content = content;
+	}
+	
+	virtual string stringify() override {
+		string s;
+		for (XMLEntity entity : content) {
+			s += entity.stringify();
+			return s;
+		}
+	}
+	
 };
 
 class XMLSCTag : public XMLTag {
 
-	XMLSCTag(string name, vector<XMLTagParameter> params) {
+	XMLSCTag(string name, vector <XMLTagParameter> params) {
 		this->name = name;
 		this->params = params;
 	}
@@ -98,7 +107,5 @@ class XMLSCTag : public XMLTag {
 
 int main()
 {
-	XMLContent content("CONTENT");
-	cout << XMLContentTag(string("TAG1"), vector<XMLTagParameter> { XMLTagParameter("KEY","VALUE") }, &content).stringify();
-	cout << endl << XMLContent("CONTENT").stringify();
+	
 }

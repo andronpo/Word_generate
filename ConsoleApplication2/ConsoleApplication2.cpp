@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <vector>
+#include <stdio.h>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ public:
 	XMLTagParameter() {	}
 
 	string stringify() {
-		return " " + key + "=\"" + value + "\"";
+		return key + "=\"" + value + "\"";
 	}
 
 };
@@ -53,17 +54,17 @@ public:
 	}
 	
 	virtual string stringify_params() {
-		string s;
+		string s = "";
 		for (XMLTagParameter param : this->params)
 			s += " " + param.stringify();
-		return (params.empty() ? "" : s);
+		return (s);
 	}
 };
 
 class XMLContentTag : public XMLTag {
 public:
-	XMLEntity *content;
-	
+	XMLEntity* content;
+
 	XMLContentTag() {}
 
 	XMLContentTag(string name, vector <XMLTagParameter> params, XMLEntity* content) {
@@ -71,6 +72,12 @@ public:
 		this->params = params;
 		this->content = content;
 	}
+
+	XMLContentTag(string name, vector <XMLTagParameter> params) : XMLContentTag(name, params, new XMLContent("")) {}
+
+	XMLContentTag(string name, XMLEntity* content) : XMLContentTag(name, vector<XMLTagParameter> {}, content) {}
+
+	XMLContentTag(string name) : XMLContentTag(name, vector<XMLTagParameter>{}, new XMLContent("")) {}
 
 	virtual string stringify() override {
 		return ("<" + this->name + this->stringify_params() + ">" + this->content->stringify() + "</" + this->name + ">");
@@ -114,13 +121,30 @@ public:
 
 int main()
 {
-	XMLContent content("CONTENT"), content1("content");
-	
+	//freopen("index.html", "w", stdout);
+	//XMLContent content("CONTENT"), content1("content");
+	/*
 	cout << XMLContentTag(string("TAG1"),
 		vector <XMLTagParameter> { XMLTagParameter("KEY", "VALUE") },
 		& XMLArray(&vector <XMLEntity*> {&content1, & XMLSCTag("tagsc", vector <XMLTagParameter> {XMLTagParameter("key", "value")})})).stringify() << endl;
 	cout << XMLContentTag(string("TAG1"), vector <XMLTagParameter> { XMLTagParameter("KEY", "VALUE") }, & content).stringify() << endl;
-	
+
 	cout << XMLSCTag("name", vector <XMLTagParameter> {}).stringify() << endl;
 	cout << XMLSCTag(string("TAG1"), vector <XMLTagParameter> { XMLTagParameter("KEY", "VALUE") }).stringify();
+	cout << XMLSCTag(string("TAG2"), vector <XMLTagParameter> {}).stringify();
+	*/
+	cout << endl << XMLContentTag("html",
+		new XMLArray(new vector<XMLEntity*>{
+			new XMLContentTag("head",
+				new XMLArray(new vector<XMLEntity*>{
+					new XMLContentTag("title", new XMLContent("Title of the page")),
+					new XMLContentTag("link", vector<XMLTagParameter>{ XMLTagParameter("rel", "stylesheet"), XMLTagParameter("href", "./styles.css") }),
+					new XMLContentTag("link", vector<XMLTagParameter>{ XMLTagParameter("icon", "./favicon.ico") })
+				})
+			),
+			new XMLContentTag("body",
+				new XMLContent("CONTENT")
+			)
+		})
+	).stringify();
 }

@@ -4,6 +4,8 @@
 
 using namespace std;
 
+
+
 class XMLTagParameter {
 	string key;
 	string value;
@@ -44,7 +46,7 @@ public:
 class XMLTag : public XMLEntity {
 public:
 	string name;
-	vector <XMLTagParameter>* params;
+	vector <XMLTagParameter>* params = new vector<XMLTagParameter> {};
 
 	XMLTag() {}
 
@@ -56,7 +58,9 @@ public:
 	virtual string stringify_params() {
 		string s = "";
 		for (XMLTagParameter param : *params)
+		{
 			s += " " + param.stringify();
+		}
 		return (s);
 	}
 };
@@ -88,10 +92,14 @@ class XMLSelfClosingTag : public XMLTag {
 public:
 	XMLSelfClosingTag() {}
 
+	
+
 	XMLSelfClosingTag(string name, vector <XMLTagParameter>* params) {
 		this->name = name;
 		this->params = params;
 	}
+
+	XMLSelfClosingTag(string name) : XMLSelfClosingTag(name, new vector <XMLTagParameter>{}) {}
 
 	virtual string stringify() override {
 		return ("<" + this->name + this->stringify_params() + "/>");
@@ -100,23 +108,99 @@ public:
 
 class XMLArray : public XMLEntity {
 public:
-	vector <XMLEntity*> *content;
+	vector <XMLEntity*>* content = new vector<XMLEntity*>{};
 
 	XMLArray() {}
 
 	XMLArray(vector <XMLEntity*> *content) {
 		this->content = content;
 	}
-	
+
+
+	XMLArray add(XMLEntity* element) {
+		this->content->push_back(element);
+		return *this;
+	}
+
 	virtual string stringify() override {
 		string s;
-		for (auto entity : *content) {
+		for (auto entity : *content) 
+		{
 			s += entity->stringify();
 		}
 		return s;
 	}
 	
 };
+
+
+//                                                 Word Templates
+
+class WordEntity {
+public:
+	string stringify() {
+		return "fo";
+	}
+};
+
+class WordParagraph : public XMLEntity {
+public: 
+	string text;
+	bool bold; 
+	bool italic;
+	bool underlined;
+
+	WordParagraph(string text, bool bold, bool italic, bool underlined) {
+		this->text = text;
+		this->bold = bold;
+		this->italic = italic;
+		this->underlined = underlined;
+	}
+	
+	string locale() {
+		string locale = "ru-RU";
+		string s_eng = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
+		for (unsigned int i = 0; i < this->text.length(); i++) 
+		{
+			for (unsigned int j = 0; j < s_eng.length(); j++)
+			{
+				if (this->text[i] == s_eng[j])
+				{
+					locale = "en-US";
+				}
+			}
+		}
+		return locale;
+	}
+
+	string stringify() {
+		XMLArray params = XMLArray();
+		if (this->bold)
+			params.add(new XMLSelfClosingTag("w:b"));
+		if (this->italic)
+			params.add(new XMLSelfClosingTag("w:i"));
+		if (this->underlined)
+			params.add(new XMLSelfClosingTag("w:u", new vector<XMLTagParameter>{ XMLTagParameter("w:val", "single") }));
+		params.add(new XMLSelfClosingTag("w:lang", new vector<XMLTagParameter> { XMLTagParameter("w:val", this->locale()) }));
+		
+		return 
+		(XMLContentTag("w:p", 
+			new XMLArray(new vector<XMLEntity*>{
+				new XMLContentTag("w:pPr", 
+					new XMLContentTag("w:rPr", 
+						&params)), 
+				new XMLContentTag("w:r",
+					new XMLArray(new vector<XMLEntity*>{
+						new XMLContentTag("w:rPr",
+							&params),
+						new XMLContentTag("w:t", new XMLContent(this->text))}))
+			}
+		)).stringify());
+	}
+
+};
+
+
 
 
 int main()
@@ -132,7 +216,7 @@ int main()
 	cout << XMLSelfClosingTag("name", vector <XMLTagParameter> {}).stringify() << endl;
 	cout << XMLSelfClosingTag(string("TAG1"), vector <XMLTagParameter> { XMLTagParameter("KEY", "VALUE") }).stringify();
 	cout << XMLSelfClosingTag(string("TAG2"), vector <XMLTagParameter> {}).stringify();
-	*/
+	
 	cout << endl << XMLContentTag("html",
 		new XMLArray(new vector<XMLEntity*>{
 			new XMLContentTag("head",
@@ -147,4 +231,6 @@ int main()
 			)
 		})
 	).stringify();
+	*/
+	cout << WordParagraph("text", true, false, false).stringify();
 }

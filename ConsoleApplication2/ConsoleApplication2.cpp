@@ -4,6 +4,13 @@
 
 using namespace std;
 
+class Stringifible {
+public:
+	virtual string stringify() {
+		return "f";
+	}
+};
+
 
 
 class XMLTagParameter {
@@ -23,14 +30,7 @@ public:
 
 };
 
-class XMLEntity {
-public:
-	virtual string stringify() {
-		return "foo";
-	}
-};
-
-class XMLContent : public XMLEntity {
+class XMLContent : public Stringifible {
 public:
 	string content;
 
@@ -43,7 +43,7 @@ public:
 	}
 };
 
-class XMLTag : public XMLEntity {
+class XMLTag : public Stringifible {
 public:
 	string name;
 	vector <XMLTagParameter>* params = new vector<XMLTagParameter> {};
@@ -57,8 +57,7 @@ public:
 	
 	virtual string stringify_params() {
 		string s = "";
-		for (XMLTagParameter param : *params)
-		{
+		for (XMLTagParameter param : *params){
 			s += " " + param.stringify();
 		}
 		return (s);
@@ -67,11 +66,11 @@ public:
 
 class XMLContentTag : public XMLTag {
 public:
-	XMLEntity* content;
+	Stringifible* content;
 
 	XMLContentTag() {}
 
-	XMLContentTag(string name, vector <XMLTagParameter>* params, XMLEntity* content) {
+	XMLContentTag(string name, vector <XMLTagParameter>* params, Stringifible* content) {
 		this->name = name;
 		this->params = params;
 		this->content = content;
@@ -79,7 +78,7 @@ public:
 
 	XMLContentTag(string name, vector <XMLTagParameter>* params) : XMLContentTag(name, params, new XMLContent("")) {}
 
-	XMLContentTag(string name, XMLEntity* content) : XMLContentTag(name, new vector<XMLTagParameter> {}, content) {}
+	XMLContentTag(string name, Stringifible* content) : XMLContentTag(name, new vector<XMLTagParameter> {}, content) {}
 
 	XMLContentTag(string name) : XMLContentTag(name, new vector<XMLTagParameter>{}, new XMLContent("")) {}
 
@@ -106,50 +105,49 @@ public:
 	}
 };
 
-class XMLArray : public XMLEntity {
-public:
-	vector <XMLEntity*>* content = new vector<XMLEntity*>{};
 
-	XMLArray() {}
+//                                                 Word Templates
 
-	XMLArray(vector <XMLEntity*> *content) {
+
+class StringifibleArray : public Stringifible {
+public: 
+	vector <Stringifible*>* content = new vector <Stringifible*>{};
+	
+	StringifibleArray() {}
+
+	StringifibleArray(vector <Stringifible*> * content) {
 		this->content = content;
 	}
 
-
-	XMLArray add(XMLEntity* element) {
+	StringifibleArray add(Stringifible* element) {
 		this->content->push_back(element);
 		return *this;
 	}
 
-	virtual string stringify() override {
+	virtual string stringify() override{
 		string s;
-		for (auto entity : *content) 
-		{
+		for (auto entity : *content) {
 			s += entity->stringify();
 		}
 		return s;
 	}
+};
+
+
+class WordChart : public Stringifible {
+public:
+
+	WordChart() {}
+
 	
 };
 
-
-//                                                 Word Templates
-
-class WordEntity {
-public:
-	string stringify() {
-		return "fo";
-	}
-};
-
-class WordParagraph : public XMLEntity {
+class WordParagraph : public Stringifible {
 public: 
 	string text;
 	bool bold; 
 	bool italic;
 	bool underlined;
-
 	WordParagraph(string text, bool bold, bool italic, bool underlined) {
 		this->text = text;
 		this->bold = bold;
@@ -174,7 +172,7 @@ public:
 	}
 
 	string stringify() {
-		XMLArray params = XMLArray();
+		StringifibleArray params = StringifibleArray();
 		if (this->bold)
 			params.add(new XMLSelfClosingTag("w:b"));
 		if (this->italic)
@@ -185,12 +183,12 @@ public:
 		
 		return 
 		(XMLContentTag("w:p", 
-			new XMLArray(new vector<XMLEntity*>{
+			new StringifibleArray(new vector<Stringifible*>{
 				new XMLContentTag("w:pPr", 
 					new XMLContentTag("w:rPr", 
 						&params)), 
 				new XMLContentTag("w:r",
-					new XMLArray(new vector<XMLEntity*>{
+					new StringifibleArray(new vector<Stringifible*>{
 						new XMLContentTag("w:rPr",
 							&params),
 						new XMLContentTag("w:t", new XMLContent(this->text))}))
@@ -200,11 +198,27 @@ public:
 
 };
 
+class WordTable : public Stringifible {
+public:
+	int rows, columns;
+	vector <Stringifible*>* content = new vector <Stringifible*>{};
 
+	WordTable() {}
+
+	WordTable(int rows, int columns, vector<Stringifible*>* content) {
+		this->rows = rows;
+		this->columns = columns;
+		this->content = content;
+	}
+
+	
+};
 
 
 int main()
 {
+	setlocale(LC_ALL, "Russian");
+	
 	//freopen("index.html", "w", stdout);
 	//XMLContent content("CONTENT"), content1("content");
 	/*

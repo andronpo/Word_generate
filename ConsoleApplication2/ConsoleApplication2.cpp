@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <vector>
 #include <stdio.h>
+#include <string>
 
 using namespace std;
 
@@ -203,7 +204,7 @@ public:
 
 class WordTable : public Stringifible {
 public:
-	int rows, columns, wide;
+	int rows, columns;
 	vector <WordParagraph*>* content = new vector <WordParagraph*>{};
 
 
@@ -214,11 +215,10 @@ public:
 		this->columns = columns;
 		this->content = content;
 	}
+
 	string stringify() {
-		this->wide = floor(9905 / columns);
-		char* buf;
-		itoa(this->wide, buf, 4);
-		string s_wide = string(buf);
+		int wide = floor(9905 / columns);
+		string s_wide = to_string(wide);
 		string s;
 		for (int row = 0; row < this->rows; row++) {
 			for (int column = 0; column < this->columns; column++) {

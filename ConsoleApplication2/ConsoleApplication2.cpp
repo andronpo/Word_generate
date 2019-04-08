@@ -115,7 +115,7 @@ public:
 	
 	StringifibleArray() {}
 
-	StringifibleArray(vector <Stringifible*> * content) {
+	StringifibleArray(vector <Stringifible*>* content) {
 		this->content = content;
 	}
 
@@ -148,6 +148,9 @@ public:
 	bool bold; 
 	bool italic;
 	bool underlined;
+
+	WordParagraph() {}
+
 	WordParagraph(string text, bool bold, bool italic, bool underlined) {
 		this->text = text;
 		this->bold = bold;
@@ -200,18 +203,35 @@ public:
 
 class WordTable : public Stringifible {
 public:
-	int rows, columns;
-	vector <Stringifible*>* content = new vector <Stringifible*>{};
+	int rows, columns, wide;
+	vector <WordParagraph*>* content = new vector <WordParagraph*>{};
+
 
 	WordTable() {}
 
-	WordTable(int rows, int columns, vector<Stringifible*>* content) {
+	WordTable(int rows, int columns, vector<WordParagraph*>* content) {
 		this->rows = rows;
 		this->columns = columns;
 		this->content = content;
 	}
+	string stringify() {
+		this->wide = floor(9905 / columns);
+		char* buf;
+		itoa(this->wide, buf, 4);
+		string s_wide = string(buf);
+		string s;
+		for (int row = 0; row < this->rows; row++) {
+			for (int column = 0; column < this->columns; column++) {
+				s += XMLContentTag("w:tc",
+					new StringifibleArray(new vector<Stringifible*>{
+						new XMLContentTag("w:tcPr", new XMLSelfClosingTag("w:tcW",
+							new vector <XMLTagParameter> { XMLTagParameter("w:w", s_wide), XMLTagParameter("w:type", "dxa") })),
+						this->content->at(columns * row + column)
+					})).stringify();
+			}
 
-	
+		}
+	}
 };
 
 

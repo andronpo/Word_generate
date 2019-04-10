@@ -12,8 +12,6 @@ public:
 	}
 };
 
-
-
 class XMLTagParameter {
 	string key;
 	string value;
@@ -107,13 +105,10 @@ public:
 };
 
 
-//                                                 Word Templates
-
-
 class StringifibleArray : public Stringifible {
-public: 
+public:
 	vector <Stringifible*>* content = new vector <Stringifible*>{};
-	
+
 	StringifibleArray() {}
 
 	StringifibleArray(vector <Stringifible*>* content) {
@@ -125,7 +120,11 @@ public:
 		return *this;
 	}
 
-	virtual string stringify() override{
+	void clear() {
+		this->content->clear();
+	}
+
+	virtual string stringify() override {
 		string s;
 		for (auto entity : *content) {
 			s += entity->stringify();
@@ -133,6 +132,9 @@ public:
 		return s;
 	}
 };
+
+
+//                                                 Word Templates
 
 
 class WordChart : public Stringifible {
@@ -217,20 +219,24 @@ public:
 	}
 
 	string stringify() {
-		int wide = floor(9905 / columns);
-		string s_wide = to_string(wide);
+		string wide = to_string((int)floor(9905 / columns));
+		StringifibleArray table = StringifibleArray();
+		StringifibleArray rows_array = StringifibleArray();
 		string s;
 		for (int row = 0; row < this->rows; row++) {
 			for (int column = 0; column < this->columns; column++) {
 				s += XMLContentTag("w:tc",
 					new StringifibleArray(new vector<Stringifible*>{
 						new XMLContentTag("w:tcPr", new XMLSelfClosingTag("w:tcW",
-							new vector <XMLTagParameter> { XMLTagParameter("w:w", s_wide), XMLTagParameter("w:type", "dxa") })),
+							new vector <XMLTagParameter> { XMLTagParameter("w:w", wide), XMLTagParameter("w:type", "dxa") })),
 						this->content->at(columns * row + column)
 					})).stringify();
+				
 			}
-
+			table.add(new XMLContentTag("w:tr", new XMLContent(s)));          // проверить                                   
+			s.clear();
 		}
+		return XMLContentTag("w:tbl", &table).stringify();
 	}
 };
 
@@ -239,7 +245,7 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 	
-	//freopen("index.html", "w", stdout);
+	freopen("index.txt", "w", stdout);
 	//XMLContent content("CONTENT"), content1("content");
 	/*
 	cout << XMLContentTag(string("TAG1"),
@@ -266,5 +272,10 @@ int main()
 		})
 	).stringify();
 	*/
-	cout << WordParagraph("text", true, false, false).stringify();
+	//cout << WordParagraph("text", true, false, false).stringify();
+	cout << WordTable(1, 3, new vector<WordParagraph*>{
+		new WordParagraph("bold", true, false, false),
+		new WordParagraph("normal", false, false, false),
+		new WordParagraph("italic", false, true, false),
+		}).stringify();
 }

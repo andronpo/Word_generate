@@ -338,3 +338,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/ConsoleApplication2/index.html
+/ConsoleApplication2/index.txt

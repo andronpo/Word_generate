@@ -90,8 +90,6 @@ class XMLSelfClosingTag : public XMLTag {
 public:
 	XMLSelfClosingTag() {}
 
-	
-
 	XMLSelfClosingTag(string name, vector <XMLTagParameter>* params) {
 		this->name = name;
 		this->params = params;
@@ -136,16 +134,22 @@ public:
 
 //                                                 Word Templates
 
+class WordTemplate : public Stringifible{
+	virtual string stringify() override {
+		return "";
+	}
+};
 
-class WordChart : public Stringifible {
+
+class WordChart : public WordTemplate {
 public:
 
 	WordChart() {}
 
-	
+	virtual string stringify() override{}
 };
 
-class WordParagraph : public Stringifible {
+class WordParagraph : public WordTemplate {
 public: 
 	string text;
 	bool bold; 
@@ -177,7 +181,7 @@ public:
 		return locale;
 	}
 
-	string stringify() {
+	virtual string stringify() override {
 		StringifibleArray params = StringifibleArray();
 		if (this->bold)
 			params.add(new XMLSelfClosingTag("w:b"));
@@ -204,11 +208,10 @@ public:
 
 };
 
-class WordTable : public Stringifible {
+class WordTable : public WordTemplate {
 public:
 	int rows, columns;
 	vector <WordParagraph*>* content = new vector <WordParagraph*>{};
-
 
 	WordTable() {}
 
@@ -218,11 +221,28 @@ public:
 		this->content = content;
 	}
 
-	string stringify() {
+	virtual string stringify() override {
+
 		string wide = to_string((int)floor(9905 / columns));
 		StringifibleArray table = StringifibleArray();
-		StringifibleArray rows_array = StringifibleArray();
+		StringifibleArray columns_array = StringifibleArray();
 		string s;
+
+		table.add(new XMLContentTag("w:tblPr",
+			new StringifibleArray(new vector<Stringifible*>{
+				new XMLSelfClosingTag("w:tblStyle",
+					new vector <XMLTagParameter> { XMLTagParameter("w:val", "TableGrid")}),
+				new XMLSelfClosingTag("w:tblW",
+					new vector <XMLTagParameter> { XMLTagParameter("w:w", "0"),
+						XMLTagParameter("w:type", "auto")}),
+				new XMLSelfClosingTag("w:tblLook")
+				})));
+		for (int column = 0; column < columns; column++) {
+			columns_array.add(new XMLSelfClosingTag("w:gridCol",
+				new vector <XMLTagParameter>{ XMLTagParameter("w:w", wide) }));
+		}     
+		table.add(new XMLContentTag("w:tblGrid", &columns_array));
+
 		for (int row = 0; row < this->rows; row++) {
 			for (int column = 0; column < this->columns; column++) {
 				s += XMLContentTag("w:tc",
@@ -233,7 +253,7 @@ public:
 					})).stringify();
 				
 			}
-			table.add(new XMLContentTag("w:tr", new XMLContent(s)));          // проверить                                   
+			table.add(new XMLContentTag("w:tr", new XMLContent(s)));                                 
 			s.clear();
 		}
 		return XMLContentTag("w:tbl", &table).stringify();
@@ -278,4 +298,7 @@ int main()
 		new WordParagraph("normal", false, false, false),
 		new WordParagraph("italic", false, true, false),
 		}).stringify();
+
+	freopen("inde.txt", "w", stdout);
+	cout << WordParagraph("text", true, false, false).stringify();
 }

@@ -140,9 +140,45 @@ class WordTemplate : public Stringifible{
 	}
 };
 
+class WordBody : public Stringifible {
+	StringifibleArray* content = new StringifibleArray();
+
+	WordBody() {}
+
+	WordBody(StringifibleArray* content) {
+		this->content = content;
+	}
+
+	virtual string stringify() override {
+		return XMLContentTag("w:document",
+			new vector <XMLTagParameter>{
+				XMLTagParameter("xmlns:wpc", "http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"),
+				XMLTagParameter("xmlns:cx", "http://schemas.microsoft.com/office/drawing/2014/chartex"),
+				XMLTagParameter("xmlns:mc", "http://schemas.openxmlformats.org/markup-compatibility/2006"),
+				XMLTagParameter("xmlns:o", "urn:schemas-microsoft-com:office:office"),
+				XMLTagParameter("xmlns:r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships"),
+				XMLTagParameter("xmlns:m", "http://schemas.openxmlformats.org/officeDocument/2006/math"),
+				XMLTagParameter("xmlns:v", "urn:schemas-microsoft-com:vml"),
+				XMLTagParameter("xmlns:wp14", "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"),
+				XMLTagParameter("xmlns:wp", "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"),
+				XMLTagParameter("xmlns:w10", "urn:schemas-microsoft-com:office:word"),
+				XMLTagParameter("xmlns:w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main"),
+				XMLTagParameter("xmlns:w14", "http://schemas.microsoft.com/office/word/2010/wordml"),
+				XMLTagParameter("xmlns:w15", "http://schemas.microsoft.com/office/word/2012/wordml"),
+				XMLTagParameter("xmlns:w16se", "http://schemas.microsoft.com/office/word/2015/wordml/symex"),
+				XMLTagParameter("xmlns:wpg", "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"),
+				XMLTagParameter("xmlns:wpi", "http://schemas.microsoft.com/office/word/2010/wordprocessingInk"),
+				XMLTagParameter("xmlns:wne", "http://schemas.microsoft.com/office/word/2012/wordml"),
+				XMLTagParameter("xmlns:wps", "http://schemas.microsoft.com/office/word/2010/wordprocessingShape")
+			}
+		).stringify();
+	}
+};
 
 class WordChart : public WordTemplate {
 public:
+	string name;
+
 
 	WordChart() {}
 

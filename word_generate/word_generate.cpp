@@ -5,73 +5,14 @@
 #include "Stringifyable.h"
 #include "XMLContent.h"
 #include "StringifyableArray.h"
+#include "XMLTagParameter.h"
+#include "XMLTag.h"
 
 
 using namespace std;
 
 
-class XMLTagParameter {
-	string key;
-	string value;
-public:
-	XMLTagParameter(string key, string value) {
-		this->key = key;
-		this->value = value;
-	}
 
-	XMLTagParameter() {	}
-
-	string stringify() {
-		return key + "=\"" + value + "\"";
-	}
-
-};
-
-
-
-class XMLTag : public Stringifyable {
-public:
-	string name;
-	vector <XMLTagParameter>* params = new vector<XMLTagParameter> {};
-
-	XMLTag() {}
-
-	XMLTag(string name, vector <XMLTagParameter>*params) {
-		this->name = name;
-		this->params = params;
-	}
-	
-	virtual string stringify_params() {
-		string s = "";
-		for (XMLTagParameter param : *params){
-			s += " " + param.stringify();
-		}
-		return (s);
-	}
-};
-
-class XMLContentTag : public XMLTag {
-public:
-	Stringifyable* content;
-
-	XMLContentTag() {}
-
-	XMLContentTag(string name, vector <XMLTagParameter>* params, Stringifyable* content) {
-		this->name = name;
-		this->params = params;
-		this->content = content;
-	}
-
-	XMLContentTag(string name, vector <XMLTagParameter>* params) : XMLContentTag(name, params, new XMLContent("")) {}
-
-	XMLContentTag(string name, Stringifyable* content) : XMLContentTag(name, new vector<XMLTagParameter> {}, content) {}
-
-	XMLContentTag(string name) : XMLContentTag(name, new vector<XMLTagParameter>{}, new XMLContent("")) {}
-
-	virtual string stringify() override {
-		return ("<" + this->name + this->stringify_params() + ">" + this->content->stringify() + "</" + this->name + ">");
-	}
-};
 
 class XMLSelfClosingTag : public XMLTag {
 public:
@@ -420,6 +361,6 @@ int main()
 	cout << WordBody(new StringifyableArray
 	(new vector <Stringifyable*>{
 			new WordParagraph("text", true, false, false),
-			new WordChart("rId5", "1")
+			//new WordChart("rId5", "1")
 		})).stringify();
 }

@@ -155,11 +155,17 @@
     <ClCompile Include="StringifyableArray.cpp" />
     <ClCompile Include="word_generate.cpp" />
     <ClCompile Include="XMLContent.cpp" />
+    <ClCompile Include="XMLContentTag.cpp" />
+    <ClCompile Include="XMLTag.cpp" />
+    <ClCompile Include="XMLTagParameter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stringifyable.h" />
     <ClInclude Include="StringifyableArray.h" />
     <ClInclude Include="XMLContent.h" />
+    <ClInclude Include="XMLContentTag.h" />
+    <ClInclude Include="XMLTag.h" />
+    <ClInclude Include="XMLTagParameter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{4DA2902C-2E93-4CA2-83FB-DA2BB5C41169}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>ConsoleApplication2</RootNamespace>
+    <RootNamespace>word_generate</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -151,7 +151,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ConsoleApplication2.cpp" />
+    <ClCompile Include="Stringifyable.cpp" />
+    <ClCompile Include="StringifyableArray.cpp" />
+    <ClCompile Include="word_generate.cpp" />
+    <ClCompile Include="XMLContent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Stringifyable.h" />
+    <ClInclude Include="StringifyableArray.h" />
+    <ClInclude Include="XMLContent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,15 +2,13 @@
 #include <vector>
 #include <stdio.h>
 #include <string>
+#include "Stringifyable.h"
+#include "XMLContent.h"
+#include "StringifyableArray.h"
+
 
 using namespace std;
 
-class Stringifible {
-public:
-	virtual string stringify() {
-		return "f";
-	}
-};
 
 class XMLTagParameter {
 	string key;
@@ -29,20 +27,9 @@ public:
 
 };
 
-class XMLContent : public Stringifible {
-public:
-	string content;
 
-	XMLContent(string content) {
-		this->content = content;
-	}
 
-	 virtual string stringify() override {
-		 return this->content;
-	}
-};
-
-class XMLTag : public Stringifible {
+class XMLTag : public Stringifyable {
 public:
 	string name;
 	vector <XMLTagParameter>* params = new vector<XMLTagParameter> {};
@@ -65,11 +52,11 @@ public:
 
 class XMLContentTag : public XMLTag {
 public:
-	Stringifible* content;
+	Stringifyable* content;
 
 	XMLContentTag() {}
 
-	XMLContentTag(string name, vector <XMLTagParameter>* params, Stringifible* content) {
+	XMLContentTag(string name, vector <XMLTagParameter>* params, Stringifyable* content) {
 		this->name = name;
 		this->params = params;
 		this->content = content;
@@ -77,7 +64,7 @@ public:
 
 	XMLContentTag(string name, vector <XMLTagParameter>* params) : XMLContentTag(name, params, new XMLContent("")) {}
 
-	XMLContentTag(string name, Stringifible* content) : XMLContentTag(name, new vector<XMLTagParameter> {}, content) {}
+	XMLContentTag(string name, Stringifyable* content) : XMLContentTag(name, new vector<XMLTagParameter> {}, content) {}
 
 	XMLContentTag(string name) : XMLContentTag(name, new vector<XMLTagParameter>{}, new XMLContent("")) {}
 
@@ -121,57 +108,31 @@ public:
 
 };
 
-class StringifibleArray : public Stringifible {
-public:
-	vector <Stringifible*>* content = new vector <Stringifible*>{};
 
-	StringifibleArray() {}
-
-	StringifibleArray(vector <Stringifible*>* content) {
-		this->content = content;
-	}
-
-	StringifibleArray add(Stringifible* element) {
-		this->content->push_back(element);
-		return *this;
-	}
-
-	void clear() {
-		this->content->clear();
-	}
-
-	virtual string stringify() override {
-		string s;
-		for (auto entity : *content) {
-			s += entity->stringify();
-		}
-		return s;
-	}
-};
 
 
 //                                                 Word Templates
 
-class WordTemplate : public Stringifible{
+class WordTemplate : public Stringifyable{
 	virtual string stringify() override {
 		return "";
 	}
 };
 
-class WordBody : public Stringifible {
+class WordBody : public Stringifyable {
 public:
-	StringifibleArray* content = new StringifibleArray();
+	StringifyableArray* content = new StringifyableArray();
 
 	WordBody() {}
 
-	WordBody(StringifibleArray* content) {
+	WordBody(StringifyableArray* content) {
 		this->content = content;
 	}
 
 	virtual string stringify() override {
 		
 		this->content->add(new XMLContentTag("w:sectPr", 
-			new StringifibleArray(new vector<Stringifible*>{
+			new StringifyableArray(new vector<Stringifyable*>{
 				new XMLSelfClosingTag("w:pgSz",
 					new vector <XMLTagParameter> { 
 						XMLTagParameter("w:w", "11906"),
@@ -194,7 +155,7 @@ public:
 			})));
 
 		return 
-			StringifibleArray(new vector <Stringifible*>{
+			StringifyableArray(new vector <Stringifyable*>{
 				new XMLCustomTag("?", "xml",
 					new vector <XMLTagParameter>{
 						XMLTagParameter("version", "1.0"),
@@ -248,7 +209,7 @@ public:
 	virtual string stringify() override{
 		return XMLContentTag("w:p",
 			new XMLContentTag("w:r",
-				new StringifibleArray(new vector <Stringifible*>{
+				new StringifyableArray(new vector <Stringifyable*>{
 					new XMLContentTag("w:rPr",
 						new XMLSelfClosingTag("w:noProof")
 					),
@@ -260,7 +221,7 @@ public:
 								XMLTagParameter("distL", "0"),
 								XMLTagParameter("distR", "0")
 							},
-							new StringifibleArray(new vector <Stringifible*>{
+							new StringifyableArray(new vector <Stringifyable*>{
 								new XMLSelfClosingTag("wp:extent",
 									new vector <XMLTagParameter>{
 										XMLTagParameter("cx", size_x),
@@ -338,7 +299,7 @@ public:
 	}
 
 	virtual string stringify() override {
-		StringifibleArray params = StringifibleArray();
+		StringifyableArray params = StringifyableArray();
 		if (this->bold)
 			params.add(new XMLSelfClosingTag("w:b"));
 		if (this->italic)
@@ -349,12 +310,12 @@ public:
 		
 		return 
 		(XMLContentTag("w:p", 
-			new StringifibleArray(new vector<Stringifible*>{
+			new StringifyableArray(new vector<Stringifyable*>{
 				new XMLContentTag("w:pPr", 
 					new XMLContentTag("w:rPr", 
 						&params)), 
 				new XMLContentTag("w:r",
-					new StringifibleArray(new vector<Stringifible*>{
+					new StringifyableArray(new vector<Stringifyable*>{
 						new XMLContentTag("w:rPr",
 							&params),
 						new XMLContentTag("w:t", new XMLContent(this->text))}))
@@ -380,12 +341,12 @@ public:
 	virtual string stringify() override {
 
 		string wide = to_string((int)floor(9905 / columns));
-		StringifibleArray table = StringifibleArray();
-		StringifibleArray columns_array = StringifibleArray();
+		StringifyableArray table = StringifyableArray();
+		StringifyableArray columns_array = StringifyableArray();
 		string s;
 
 		table.add(new XMLContentTag("w:tblPr",
-			new StringifibleArray(new vector<Stringifible*>{
+			new StringifyableArray(new vector<Stringifyable*>{
 				new XMLSelfClosingTag("w:tblStyle",
 					new vector <XMLTagParameter> { XMLTagParameter("w:val", "TableGrid")}),
 				new XMLSelfClosingTag("w:tblW",
@@ -402,7 +363,7 @@ public:
 		for (int row = 0; row < this->rows; row++) {
 			for (int column = 0; column < this->columns; column++) {
 				s += XMLContentTag("w:tc",
-					new StringifibleArray(new vector<Stringifible*>{
+					new StringifyableArray(new vector<Stringifyable*>{
 						new XMLContentTag("w:tcPr", new XMLSelfClosingTag("w:tcW",
 							new vector <XMLTagParameter> { XMLTagParameter("w:w", wide), XMLTagParameter("w:type", "dxa") })),
 						this->content->at(columns * row + column)
@@ -456,8 +417,8 @@ int main()
 		}).stringify();
 
 	freopen("inde.txt", "w", stdout);
-	cout << WordBody(new StringifibleArray
-	(new vector <Stringifible*>{
+	cout << WordBody(new StringifyableArray
+	(new vector <Stringifyable*>{
 			new WordParagraph("text", true, false, false),
 			new WordChart("rId5", "1")
 		})).stringify();

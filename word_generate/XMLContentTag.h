@@ -11,6 +11,12 @@ public:
 
 	XMLContentTag(std::string name, std::vector <XMLTagParameter>* params, Stringifyable* content);
 
+	XMLContentTag(std::string name, Stringifyable* content);
+
+	XMLContentTag(std::string name);
+
+	XMLContentTag(std::string name, std::vector <XMLTagParameter>* params);
+
 	virtual std::string stringify() override;
 
 	XMLContentTag();

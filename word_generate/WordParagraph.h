@@ -1,19 +1,16 @@
 #pragma once
 #include "WordTemplate.h"
+#include "WordPhrase.h"
+
 class WordParagraph :
 	public WordTemplate
 {
 public:
-	std::string text;
-	bool bold;
-	bool italic;
-	bool underlined;
-
-	std::string locale();
+	StringifyableArray* phrases = new StringifyableArray();
 
 	virtual std::string stringify() override;
 
-	WordParagraph(std::string text, bool bold, bool italic, bool underlined);
+	WordParagraph(StringifyableArray* phrases);
 
 	WordParagraph();
 	

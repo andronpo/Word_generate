@@ -1,5 +1,4 @@
 #pragma once
-#include "WordTemplate.h"
 #include "WordPhrase.h"
 
 class WordParagraph :

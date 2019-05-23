@@ -151,7 +151,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Stringifyable.cpp" />
     <ClCompile Include="StringifyableArray.cpp" />
     <ClCompile Include="WordBody.cpp" />
@@ -169,7 +168,6 @@
     <ClCompile Include="XMLTagParameter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Parser.h" />
     <ClInclude Include="Stringifyable.h" />
     <ClInclude Include="StringifyableArray.h" />
     <ClInclude Include="WordBody.h" />

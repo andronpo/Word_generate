@@ -5,6 +5,7 @@
 #include "XMLContentTag.h"
 #include "XMLSelfClosingTag.h"
 #include "XMLCustomTag.h"
+#include "WordTable.h"
 
 class WordBody :
 	public Stringifyable

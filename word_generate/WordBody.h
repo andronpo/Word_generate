@@ -9,9 +9,11 @@
 class WordBody :
 	public Stringifyable
 {
-public:
+protected:
 	StringifyableArray* content = new StringifyableArray();
 
+public:
+	
 	virtual std::string stringify() override;
 
 	WordBody(StringifyableArray* content);

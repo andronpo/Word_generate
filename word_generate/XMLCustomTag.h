@@ -4,8 +4,10 @@
 class XMLCustomTag :
 	public XMLTag
 {
-public:
+private:
 	std::string prefix, suffix;
+
+public:
 	
 	virtual std::string stringify() override;
 

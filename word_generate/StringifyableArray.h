@@ -5,7 +5,7 @@
 class StringifyableArray :
 	public Stringifyable
 {
-
+protected:
 	std::vector <Stringifyable*>* content = new std::vector <Stringifyable*>{};
 
 public:

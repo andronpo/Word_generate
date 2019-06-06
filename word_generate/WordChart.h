@@ -4,12 +4,14 @@
 class WordChart :
 	public WordTemplate
 {
-public:
+private:
 	std::string name;
 	std::string id;
 	std::string size_x;
 	std::string size_y;
 
+public:
+	
 	virtual std::string stringify() override;
 
 	WordChart(std::string id, std::string name, std::string size_x, std::string size_y);

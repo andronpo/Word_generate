@@ -6,8 +6,11 @@
 class XMLContentTag :
 	public XMLTag
 {
-public:
+private:
 	Stringifyable* content;
+
+public:
+	
 
 	XMLContentTag(std::string name, std::vector <XMLTagParameter>* params, Stringifyable* content);
 

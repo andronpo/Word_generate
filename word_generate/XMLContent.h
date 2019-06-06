@@ -4,6 +4,7 @@
 class XMLContent :
 	public Stringifyable
 {
+protected:
 	std::string content;
 
 public:

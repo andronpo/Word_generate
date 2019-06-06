@@ -3,11 +3,13 @@
 class WordParagraph :
 	public WordTemplate
 {
-public:
+private:
 	std::string text;
 	bool bold;
 	bool italic;
 	bool underlined;
+
+public:
 
 	std::string locale();
 
